@@ -941,16 +941,17 @@ require('lazy').setup({
     vim.keymap.set('n', ',tl', ':TestLast -strategy=vimux<CR>', { desc = 'Test Last' }),
     vim.keymap.set('n', ',tv', ':TestVisit<CR>', { desc = 'Test Visit' }),
   },
-
-  -- Markdown preview plugin
-  -- {
-  --   'iamcco/markdown-preview.nvim',
-  --   cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
-  --   ft = { 'markdown' },
-  --   build = function()
-  --     vim.fn['mkdp#util#install']()
-  --   end,
-  -- },
+  -- oil plugin
+  {
+    'stevearc/oil.nvim',
+    ---@module 'oil'
+    ---@type oil.SetupOpts
+    opts = {},
+    -- Optional dependencies
+    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
+    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
+    vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' }),
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
