@@ -944,6 +944,7 @@ require('lazy').setup({
     vim.keymap.set('n', ',tl', ':TestLast -strategy=vimux<CR>', { desc = 'Test Last' }),
     vim.keymap.set('n', ',tv', ':TestVisit<CR>', { desc = 'Test Visit' }),
   },
+
   -- oil plugin
   {
     'stevearc/oil.nvim',
@@ -959,10 +960,20 @@ require('lazy').setup({
     dependencies = { 'nvim-tree/nvim-web-devicons' }, -- use if prefer nvim-web-devicons
     vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' }),
   },
+
   --  NOTE: The following plugin causes an issue with telescope, not being able to select an item from search dialogs
   -- {
   --   'tmsvg/pear-tree',
   -- },
+
+  -- context plugin
+  {
+    'wellle/context.vim',
+  },
+
+  {
+    'tpope/vim-fugitive',
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
