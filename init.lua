@@ -527,7 +527,18 @@ require('lazy').setup({
       local servers = {
         basedpyright = {},
         -- clangd = {},
-        gopls = {},
+        gopls = {
+          settings = {
+            gopls = {
+              completeUnimported = true,
+              usePlaceholders = true,
+              analyses = {
+                unusedparams = true,
+              },
+            },
+          },
+        },
+
         -- pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -568,7 +579,8 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
-        'hclfmt',
+        'hclfmt', -- Formatting HCL files from HCP
+        'delve', -- For debugging Go
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -849,7 +861,23 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'go',
+        'python',
+        'java',
+        'kotlin',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -967,12 +995,105 @@ require('lazy').setup({
   -- },
 
   -- context plugin
-  {
-    'wellle/context.vim',
-  },
+  -- MY ISSUE: This caused scrolling on hyprland ubuntu to become super slow
+  -- {
+  --   'wellle/context.vim',
+  -- },
 
+  -- Vim git fugitive
   {
     'tpope/vim-fugitive',
+  },
+
+  -- Debugging
+  {
+    'mfussenegger/nvim-dap',
+
+    dependencies = {
+      'rcarriga/nvim-dap-ui',
+      'leoluz/nvim-dap-go',
+      'nvim-neotest/nvim-nio',
+    },
+
+    config = function()
+      local dap, dapui = require 'dap', require 'dapui'
+      local dapgo = require 'dap-go'
+      dapui.setup()
+      dapgo.setup()
+      dap.listeners.before.attach.dapui_config = function()
+        dapui.open()
+      end
+      dap.listeners.before.launch.dapui_config = function()
+        dapui.open()
+      end
+
+      -- Include the next few lines until the comment only if you feel you need it
+      -- dap.listeners.before.event_terminated.dapui_config = function()
+      --   dapui.close()
+      -- end
+      -- dap.listeners.before.event_exited.dapui_config = function()
+      --   dapui.close()
+      -- end
+      -- Include everything after this
+
+      vim.keymap.set('n', '<Leader>dc', function()
+        require('dap').continue()
+      end)
+      vim.keymap.set('n', '<Leader>dv', function()
+        require('dap').step_over()
+      end)
+      vim.keymap.set('n', '<Leader>di', function()
+        require('dap').step_into()
+      end)
+      vim.keymap.set('n', '<Leader>do', function()
+        require('dap').step_out()
+      end)
+      vim.keymap.set('n', '<Leader>db', function()
+        require('dap').toggle_breakpoint()
+      end)
+      -- vim.keymap.set('n', '<Leader>Q', function()
+      --   require('dap').set_breakpoint()
+      -- end)
+      -- vim.keymap.set('n', '<Leader>lp', function()
+      --   require('dap').set_breakpoint(nil, nil, vim.fn.input 'Log point message: ')
+      -- end)
+      vim.keymap.set('n', '<Leader>dr', function()
+        require('dap').repl.open()
+      end)
+      vim.keymap.set('n', '<Leader>dl', function()
+        require('dap').run_last()
+      end)
+
+      vim.keymap.set('n', '<Leader>dw', function()
+        dapui.toggle()
+      end)
+
+      -- Change dap-ui signs appearence, taken from thread: https://github.com/mfussenegger/nvim-dap/discussions/355#discussioncomment-2159022
+      -- vim.api.nvim_set_hl(0, 'blue', { fg = '#3d59a1' })
+      -- vim.api.nvim_set_hl(0, 'green', { fg = '#9ece6a' })
+      -- vim.api.nvim_set_hl(0, 'yellow', { fg = '#FFFF00' })
+      -- vim.api.nvim_set_hl(0, 'orange', { fg = '#f09000' })
+      --
+      vim.fn.sign_define('DapBreakpoint', { text = '⬤', texthl = '', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' })
+      -- vim.fn.sign_define('DapBreakpointCondition', { text = '•', texthl = 'blue', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' })
+      -- vim.fn.sign_define('DapBreakpointRejected', { text = '•', texthl = 'orange', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' })
+      -- vim.fn.sign_define('DapStopped', { text = '•', texthl = 'green', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' })
+      -- vim.fn.sign_define('DapLogPoint', { text = '•', texthl = 'yellow', linehl = 'DapBreakpoint', numhl = 'DapBreakpoint' })
+    end,
+  },
+  {
+    'leoluz/nvim-dap-go',
+    ft = 'go',
+    dependencies = 'mfussenegger/nvim-dap',
+    config = function(_, opts)
+      require('dap-go').setup(opts)
+    end,
+  },
+  {
+    'nvim-neotest/nvim-nio',
+  },
+  {
+    'rcarriga/nvim-dap-ui',
   },
 }, {
   ui = {
