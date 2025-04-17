@@ -100,6 +100,28 @@ vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
+-- Folding configuration
+--
+vim.o.foldenable = true
+vim.o.foldlevel = 99
+vim.o.foldtext = '...'
+vim.opt.foldcolumn = '0'
+vim.opt.fillchars:append { fold = ' ' }
+
+vim.o.foldmethod = 'expr'
+-- Default to treesitter folding
+vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+-- Prefer LSP folding if client supports it
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client:supports_method 'textDocument/foldingRange' then
+      local win = vim.api.nvim_get_current_win()
+      vim.wo[win][0].foldexpr = 'v:lua.vim.lsp.foldexpr()'
+    end
+  end,
+})
+
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
 --
@@ -538,7 +560,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
+        ts_ls = {},
         --
 
         lua_ls = {
@@ -704,9 +726,9 @@ require('lazy').setup({
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
-          ['<CR>'] = cmp.mapping.confirm { select = true },
-          ['<Tab>'] = cmp.mapping.select_next_item(),
-          ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+          -- ['<CR>'] = cmp.mapping.confirm { select = true },
+          -- ['<Tab>'] = cmp.mapping.select_next_item(),
+          -- ['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
@@ -852,7 +874,28 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'python' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'python',
+        'vue',
+        'css',
+        'scss',
+        'json',
+        'yaml',
+        'toml',
+        'go',
+        'dockerfile',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -965,18 +1008,12 @@ require('lazy').setup({
   },
 
   --  NOTE: The following plugin causes an issue with telescope, not being able to select an item from search dialogs
-  -- {
-  --   'tmsvg/pear-tree',
-  -- },
+  -- { 'tmsvg/pear-tree' },
 
   -- context plugin
-  -- {
-  --   'wellle/context.vim',
-  -- },
+  -- { 'wellle/context.vim' },
 
-  {
-    'tpope/vim-fugitive',
-  },
+  { 'tpope/vim-fugitive' },
   {
     'folke/trouble.nvim',
     opts = {}, -- for default options, refer to the configuration section for custom setup.
@@ -1014,6 +1051,74 @@ require('lazy').setup({
       },
     },
   },
+
+  -- GitHub Copilot
+  { 'github/copilot.vim' },
+
+  -- VueJS
+  -- { 'posva/vim-vue' },
+
+  -- avante.nvim
+  -- {
+  -- 'yetone/avante.nvim',
+  -- event = 'VeryLazy',
+  -- version = false, -- Never set this value to "*"! Never!
+  -- opts = {
+  --   -- add any opts here
+  --   -- for example
+  --   provider = 'openai',
+  --   openai = {
+  --     endpoint = 'https://api.openai.com/v1',
+  --     model = 'gpt-4o', -- your desired model (or use gpt-4o, etc.)
+  --     timeout = 30000, -- Timeout in milliseconds, increase this for reasoning models
+  --     temperature = 0,
+  --     max_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
+  --     --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
+  --   },
+  -- },
+  -- -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+  -- build = 'make',
+  -- -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
+  -- dependencies = {
+  --   'nvim-treesitter/nvim-treesitter',
+  --   'stevearc/dressing.nvim',
+  --   'nvim-lua/plenary.nvim',
+  --   'MunifTanjim/nui.nvim',
+  --   --- The below dependencies are optional,
+  --   'echasnovski/mini.pick', -- for file_selector provider mini.pick
+  --   'nvim-telescope/telescope.nvim', -- for file_selector provider telescope
+  --   'hrsh7th/nvim-cmp', -- autocompletion for avante commands and mentions
+  --   'ibhagwan/fzf-lua', -- for file_selector provider fzf
+  --   'nvim-tree/nvim-web-devicons', -- or echasnovski/mini.icons
+  --   'zbirenbaum/copilot.lua', -- for providers='copilot'
+  --   {
+  --     -- support for image pasting
+  --     'HakonHarnes/img-clip.nvim',
+  --     event = 'VeryLazy',
+  --     opts = {
+  --       -- recommended settings
+  --       default = {
+  --         embed_image_as_base64 = false,
+  --         prompt_for_file_name = false,
+  --         drag_and_drop = {
+  --           insert_mode = true,
+  --         },
+  --         -- required for Windows users
+  --         use_absolute_path = true,
+  --       },
+  --     },
+  --   },
+  --   {
+  --     -- Make sure to set this up properly if you have lazy=true
+  --     'MeanderingProgrammer/render-markdown.nvim',
+  --     opts = {
+  --       file_types = { 'markdown', 'Avante' },
+  --     },
+  --     ft = { 'markdown', 'Avante' },
+  --   },
+  -- },
+  -- },
+  -- { 'kevinhwang91/nvim-ufo' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
