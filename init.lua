@@ -592,8 +592,11 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
-        'hclfmt',
+        -- 'hclfmt',
         'ruff',
+        'jq',
+        'prettierd',
+        'prettier',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -650,7 +653,8 @@ require('lazy').setup({
         python = { 'ruff' },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        json = { 'jq', 'prettierd', 'prettier', stop_after_first = true },
       },
     },
   },
@@ -1054,6 +1058,9 @@ require('lazy').setup({
 
   -- GitHub Copilot
   { 'github/copilot.vim' },
+
+  -- Helm syntax highlighting
+  { 'towolf/vim-helm' },
 
   -- VueJS
   -- { 'posva/vim-vue' },
