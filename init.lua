@@ -83,8 +83,8 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-vim.diagnostic.config { virtual_text = false }
-vim.keymap.set('n', '<leader>e', ":lua vim.diagnostic.open_float(0, { scope = 'line' })<CR>", { desc = 'Open diagnostic [Q]uickfix list' })
+vim.diagnostic.config { virtual_text = true }
+-- vim.keymap.set('n', '<leader>e', ":lua vim.diagnostic.open_float(0, { scope = 'line' })<CR>", { desc = 'Open current diagnostic message' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -791,6 +791,7 @@ require('lazy').setup({
     name = 'catppuccin',
     priority = 1000,
     opts = {
+      flavour = 'mocha', -- latte, frappe, macchiato, mocha
       term_colors = true,
       transparent_background = true,
       dim_inactive = {
@@ -832,10 +833,16 @@ require('lazy').setup({
           indentscope_color = '',
         },
       },
+      custom_highlights = function(colors)
+        return {
+          NormalFloat = { bg = '#403e52' },
+          -- FloatBorder = { bg = '#FFFFFF', fg = '#FFFFFF' },
+        }
+      end,
     },
     config = function(_, opts)
       require('catppuccin').setup(opts)
-      vim.cmd.colorscheme 'catppuccin-macchiato'
+      vim.cmd.colorscheme 'catppuccin'
     end,
   },
 
