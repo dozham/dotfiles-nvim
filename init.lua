@@ -597,6 +597,7 @@ require('lazy').setup({
         'jq',
         'prettierd',
         'prettier',
+        'vue-language-server',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -835,8 +836,13 @@ require('lazy').setup({
       },
       custom_highlights = function(colors)
         return {
-          NormalFloat = { bg = '#403e52' },
+          NormalFloat = { bg = '#403e52' }, -- Change color of floating windows
           -- FloatBorder = { bg = '#FFFFFF', fg = '#FFFFFF' },
+          --
+          DiagnosticVirtualTextWarn = {
+            fg = '#4b5750',
+            italic = true,
+          },
         }
       end,
     },
@@ -976,23 +982,23 @@ require('lazy').setup({
   },
 
   -- Vim tmux configuration
-  {
-    'christoomey/vim-tmux-navigator',
-    cmd = {
-      'TmuxNavigateLeft',
-      'TmuxNavigateDown',
-      'TmuxNavigateUp',
-      'TmuxNavigateRight',
-      'TmuxNavigatePrevious',
-    },
-    keys = {
-      { '<c-h>', '<cmd><C-U>TmuxNavigateLeft<cr>' },
-      { '<c-j>', '<cmd><C-U>TmuxNavigateDown<cr>' },
-      { '<c-k>', '<cmd><C-U>TmuxNavigateUp<cr>' },
-      { '<c-l>', '<cmd><C-U>TmuxNavigateRight<cr>' },
-      { '<c-\\>', '<cmd><C-U>TmuxNavigatePrevious<cr>' },
-    },
-  },
+  -- {
+  --   'christoomey/vim-tmux-navigator',
+  --   cmd = {
+  --     'TmuxNavigateLeft',
+  --     'TmuxNavigateDown',
+  --     'TmuxNavigateUp',
+  --     'TmuxNavigateRight',
+  --     'TmuxNavigatePrevious',
+  --   },
+  --   keys = {
+  --     { '<c-h>', '<cmd><C-U>TmuxNavigateLeft<cr>' },
+  --     { '<c-j>', '<cmd><C-U>TmuxNavigateDown<cr>' },
+  --     { '<c-k>', '<cmd><C-U>TmuxNavigateUp<cr>' },
+  --     { '<c-l>', '<cmd><C-U>TmuxNavigateRight<cr>' },
+  --     { '<c-\\>', '<cmd><C-U>TmuxNavigatePrevious<cr>' },
+  --   },
+  -- },
 
   -- vim-test plugin
   -- Keybindings to run tests using vim-test plugin
@@ -1076,6 +1082,33 @@ require('lazy').setup({
   -- Helm syntax highlighting
   { 'towolf/vim-helm' },
 
+  -- Vim and Kitty naviagation
+  {
+    'knubie/vim-kitty-navigator',
+  },
+
+  {
+    'hat0uma/csvview.nvim',
+    ---@module "csvview"
+    ---@type CsvView.Options
+    opts = {
+      parser = { comments = { '#', '//' } },
+      keymaps = {
+        -- Text objects for selecting fields
+        textobject_field_inner = { 'if', mode = { 'o', 'x' } },
+        textobject_field_outer = { 'af', mode = { 'o', 'x' } },
+        -- Excel-like navigation:
+        -- Use <Tab> and <S-Tab> to move horizontally between fields.
+        -- Use <Enter> and <S-Enter> to move vertically between rows and place the cursor at the end of the field.
+        -- Note: In terminals, you may need to enable CSI-u mode to use <S-Tab> and <S-Enter>.
+        jump_next_field_end = { '<Tab>', mode = { 'n', 'v' } },
+        jump_prev_field_end = { '<S-Tab>', mode = { 'n', 'v' } },
+        jump_next_row = { '<Enter>', mode = { 'n', 'v' } },
+        jump_prev_row = { '<S-Enter>', mode = { 'n', 'v' } },
+      },
+    },
+    cmd = { 'CsvViewEnable', 'CsvViewDisable', 'CsvViewToggle' },
+  },
   -- VueJS
   -- { 'posva/vim-vue' },
 
